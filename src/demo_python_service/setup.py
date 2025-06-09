@@ -13,7 +13,7 @@ setup(
         ('share/' + package_name+"/resource",['resource/default.jpg','resource/test1.png']),
     ],
     # Add face_recognition to required dependencies
-    install_requires=['setuptools', 'face_recognition'],  # <-- Modified line
+    install_requires=['setuptools', 'face_recognition', 'opencv-python'],  # 添加 opencv-python 依赖
     zip_safe=True,
     maintainer='ws',
     maintainer_email='ws@todo.todo',
@@ -25,6 +25,7 @@ setup(
             'learn_face_recognize = demo_python_service.learn_face_recognize:main',
             'face_detect_node = demo_python_service.face_detect_node:main',
             'face_detect_client_node = demo_python_service.face_detect_client_node:main',
+            'camera_node = demo_python_service.camera_node:main',  # 添加摄像头节点
         ],
     },
 )
