@@ -41,6 +41,7 @@ class CameraNode(Node):
         self.bridge = CvBridge()
         
         # 检查摄像头是否可用
+        print("正在尝试打开摄像头...")
         self.camera = cv2.VideoCapture(0)
         if not self.camera.isOpened():
             self.get_logger().error('无法打开摄像头！请检查摄像头是否正确连接')
