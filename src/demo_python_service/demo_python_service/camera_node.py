@@ -50,6 +50,19 @@ class CameraNode(Node):
         
         # 创建定时器，定期从摄像头获取图像
         self.timer = self.create_timer(0.1, self.timer_callback)  # 10Hz
+
+    def timer_callback(self):
+        # 定时器回调：从摄像头获取图像并调用检测服务
+        ret, frame = self.camera.read()
+        if not ret:
+            self.get_logger().error('无法读取摄像头画面')
+            return
+        # 转换为ROS图像消息
+        img_msg = self.bridge.cv2_to_imgmsg(frame, 'bgr8')
+        # 调用检测服务
+        self.req.image = img_msg
+        future = self.face_detect_client.call_async(self.req)
+        future.add_done_callback(self.face_detect_callback)
         
         # 创建人脸检测服务的客户端
         self.face_detect_client = self.create_client(FaceDetector, 'face_detect')
@@ -59,14 +72,20 @@ class CameraNode(Node):
             return
         
         # 硬件初始化
-        # 新增：初始化云台和激光雷达（需根据实际硬件调整端口）
-        self.gimbal = BaseController('COM3', 115200)  # Windows串口格式为COMx
+        # 初始化云台（添加异常处理防止属性缺失）
+        try:
+            self.gimbal = BaseController('COM3', 115200)  # Windows串口格式为COMx
+            self.get_logger().info("[Gimbal] 云台连接成功")
+        except Exception as e:
+            self.get_logger().error("[Gimbal] 连接失败，使用虚拟控制器", e)
+            self.gimbal = None  # 确保属性存在
+        # 初始化激光雷达
         try:
             self.lidar_ser = serial.Serial('COM4', 230400, timeout=1)
             self.get_logger().info("[Lidar] 已连接到COM4")
         except Exception as e:
             self.get_logger().error("[Lidar] 连接失败", e)
-            exit(1)
+            self.lidar_ser = None  # 确保属性存在
         
         # 新增：图像参数（根据实际摄像头调整）
         self.image_width = 640  # 需与摄像头实际分辨率一致
