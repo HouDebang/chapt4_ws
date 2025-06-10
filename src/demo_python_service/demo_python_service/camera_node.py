@@ -5,8 +5,35 @@ from cv_bridge import CvBridge
 import cv2
 from chapt4_interfaces.srv import FaceDetector
 import numpy as np
-import serial  # 新增激光雷达串口库
-from laser_yuntai import BaseController, get_lidar_measurement  # 引入云台和雷达功能
+import serial  # 激光雷达串口库
+import time
+
+# 内联实现原laser_yuntai.py的云台控制功能
+class BaseController:
+    def __init__(self, port, baudrate):
+        self.ser = serial.Serial(port, baudrate, timeout=0.1)
+        if not self.ser.is_open:
+            raise Exception(f"无法打开串口 {port}")
+
+    def move_gimbal(self, angle_x, angle_y, speed, acc):
+        # 示例协议：假设云台接收格式为"AX{:.1f}AY{:.1f}S{:d}A{:d}\n"的指令
+        cmd = f"AX{angle_x:.1f}AY{angle_y:.1f}S{speed}A{acc}\n"
+        self.ser.write(cmd.encode('utf-8'))
+
+    def close(self):
+        if self.ser.is_open:
+            self.ser.close()
+
+# 内联实现原laser_yuntai.py的雷达测距功能
+def get_lidar_measurement(ser):
+    # 示例协议：假设雷达返回格式为"DIST:1234.5mm\n"的字符串
+    data = ser.readline().decode('utf-8').strip()
+    if data.startswith("DIST:"):
+        try:
+            return float(data.split(":")[1].replace("mm", ""))
+        except:
+            return 0.0
+    return 0.0
 
 class CameraNode(Node):
     def __init__(self):
@@ -72,7 +99,7 @@ class CameraNode(Node):
                 left = response.left[idx]
                 top = response.top[idx]
                 right = response.right[idx]
-                bottom = response.bottle[idx]
+                bottom = response.bottom[idx]
 
                 # 计算目标中心坐标
                 target_center_x = (left + right) // 2
