@@ -10,22 +10,27 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name+"/resource",['resource/default.jpg','resource/test1.png']),
+        ('share/' + package_name + "/resource", ['resource/default.jpg', 'resource/test1.png']),
     ],
-    # Add face_recognition to required dependencies
-    install_requires=['setuptools', 'face_recognition', 'opencv-python'],  # 添加 opencv-python 依赖
+    install_requires=[
+        'setuptools',
+        'rclpy',
+        'sensor_msgs',
+        'cv_bridge',
+        'opencv-python',
+        'numpy'
+    ],
     zip_safe=True,
     maintainer='ws',
     maintainer_email='ws@todo.todo',
-    description='TODO: Package description',
+    description='Python ROS2 demo with camera, face detection, and lidar simulation',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'learn_face_recognize = demo_python_service.learn_face_recognize:main',
+            'camera_node = demo_python_service.camera_node:main',
             'face_detect_node = demo_python_service.face_detect_node:main',
-            'face_detect_client_node = demo_python_service.face_detect_client_node:main',
-            'camera_node = demo_python_service.camera_node:main',  # 添加摄像头节点
+            'lidar_node = demo_python_service.lidar_node:main',
         ],
     },
 )
