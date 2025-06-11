@@ -12,6 +12,9 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/FaceDetector.srv"
+  "srv/LidarDistance.srv"
+  "msg/FacePosition.msg"        # Add message definitions
+  "msg/LidarDistance.msg"
   DEPENDENCIES sensor_msgs
 )
 

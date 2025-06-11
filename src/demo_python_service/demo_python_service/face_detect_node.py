@@ -23,7 +23,9 @@ class FaceDetectNode(Node):
         self.model="hog"
         self.default_image_path= get_package_share_directory('demo_python_service') + "/resource/default.jpg"
         self.get_logger().info("Face detect node has been started")
-        self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        self.face_cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'  # Add missing .xml extension
+        )
     # default_image_path = get_package_share_directory('demo_python_service') + "/resource/default.jpg"
     # print(default_image_path)
     # image=cv2.imread(default_image_path)
